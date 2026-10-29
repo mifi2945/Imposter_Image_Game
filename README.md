@@ -1,4 +1,25 @@
 # Imposter_Image_Game
+Alex Ewart, Mikhail Filippov, Liam Otten, Oskar Sierzega
+
+---
+
+[here](https://lucid.app/lucidspark/6aee173d-5052-468c-a86d-204b46e9f262/edit?viewport_loc=928%2C-2633%2C4257%2C2357%2C0_0&invitationId=inv_abb56715-4ca7-4596-b18d-1a0e54b831ec) is the design whiteboard (lucidspark).
+
+Game Flow
+1. Game starts
+2. Main Loop
+   1. Question is displayed  to  aall except impostor, who getsdi different question
+   2. All users enter answer
+   3. Answers are displayed for all. Chat time
+   4. Vote on impostor
+   5 .Impostor is revealed
+   6. If impostor is not found, they gain 3 points
+   7. If impostor is found, non impostors  each gain 1 point
+   8. Repeat X times
+3. Game end
+   1. sum up points
+   2. highest points win
+
 ## CSC4201 — Project Requirements
 For this project, you are again part of a 2-4 person team building a microservice application. This time, you have some additional freedom, in choosing your team, and in designing your application. You are allowed/encouraged to choose your own application—subject to time constraints and the minimal require- ments later in this document. A suggested project is described later in this document as a fallback.
 ### Timeline
