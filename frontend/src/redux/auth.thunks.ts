@@ -5,10 +5,10 @@ import type { State } from "./store";
 
 export const signIn = createAsyncThunk(
     "auth/signIn",
-    async (parameters: { email: string; password: string }) => {
-        const { email, password } = parameters;
+    async (parameters: { username: string; password: string }) => {
+        const { username, password } = parameters;
 
-        validationHelpers.validateUsername(email);
+        validationHelpers.validateUsername(username);
         validationHelpers.validatePassword(password);
 
         return await authHub.signIn(parameters);
@@ -30,10 +30,10 @@ export const signIn = createAsyncThunk(
 
 export const signUp = createAsyncThunk(
     "auth/signUp",
-    async (parameters: { email: string; password: string }) => {
-        const { email, password } = parameters;
+    async (parameters: { username: string; password: string }) => {
+        const { username, password } = parameters;
 
-        validationHelpers.validateUsername(email);
+        validationHelpers.validateUsername(username);
         validationHelpers.validatePassword(password);
 
         return await authHub.signUp(parameters);

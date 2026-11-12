@@ -1,6 +1,6 @@
 export function validateUsername(username: string) {
     if (!username) {
-        throw new Error("Email cannot be empty");
+        throw new Error("Username cannot be empty");
     }
 
     if (username.length < 3) {
