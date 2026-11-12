@@ -24,10 +24,10 @@ const initialState: AuthState = {
     accessToken: "",
     refreshToken: "",
     account: {
-        id: "",
         createdAt: new Date().toISOString(),
         username: "",
         role: AccountRole.User,
+        points: 0,
     },
 };
 
@@ -41,6 +41,18 @@ const slice = createSlice({
         setTokens(state, action: PayloadAction<{ accessToken: string; refreshToken: string }>) {
             state.accessToken = action.payload.accessToken;
             state.refreshToken = action.payload.refreshToken;
+        },
+        setMockAuth(state) {
+            state.isLoading = false;
+            state.errorMessage = "";
+            state.accessToken = "mock-access-token";
+            state.refreshToken = "mock-refresh-token";
+            state.account = {
+                createdAt: new Date().toISOString(),
+                username: "demo-player",
+                role: AccountRole.Admin,
+                points: 2400,
+            };
         },
         clearError(state) {
             state.errorMessage = "";

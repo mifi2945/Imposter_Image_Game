@@ -1,4 +1,4 @@
-import { useEffect, useState, type FormEvent } from "react";
+import { useState, type FormEvent } from "react";
 import {
     Alert,
     Button,
@@ -12,12 +12,10 @@ import {
 } from "@mantine/core";
 import { useActions, useAppSelector } from "~/hooks";
 import { authSlice } from "~/redux";
-import { useNavigate } from "react-router-dom";
 
 export function CredentialsPage() {
-    const navigate = useNavigate();
-    const { clearError, signIn, signUp } = useActions(authSlice.actions);
-    const { accessToken, errorMessage, isLoading } = useAppSelector((state) => state.auth);
+    const { clearError, setMockAuth, signIn, signUp } = useActions(authSlice.actions);
+    const { errorMessage, isLoading } = useAppSelector((state) => state.auth);
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
 
@@ -30,15 +28,6 @@ export function CredentialsPage() {
         if (isSignUp) signUp({ username, password });
         else signIn({ username, password });
     }
-
-    useEffect(() => {
-        if (accessToken) {
-            navigate("/lobbies");
-            setUsername("");
-            setPassword("");
-            clearError();
-        }
-    }, [accessToken]);
 
     return (
         <Container size="xs" py="xl">
@@ -82,6 +71,9 @@ export function CredentialsPage() {
                                 Sign up
                             </Button>
                         </Group>
+                        <Button type="button" variant="light" onClick={() => setMockAuth()}>
+                            Explore with demo account
+                        </Button>
                     </Stack>
                 </form>
             </Stack>
