@@ -1,0 +1,41 @@
+substitutions:
+  _REGION: us-central1
+  _AR_REPOSITORY: imposter-repo
+  _CLUSTER_NAME: questions-cluster
+  _CLUSTER_LOCATION: us-central1
+
+steps:
+  - name: gcr.io/cloud-builders/docker
+    args:
+      - build
+      - -t
+      - ${_REGION}-docker.pkg.dev/$PROJECT_ID/${_AR_REPOSITORY}/questions-api:$BUILD_ID
+      - -f
+      - QuestionsApi/api/Dockerfile
+      - QuestionsApi/api
+
+  - name: gcr.io/cloud-builders/docker
+    args:
+      - push
+      - ${_REGION}-docker.pkg.dev/$PROJECT_ID/${_AR_REPOSITORY}/questions-api:$BUILD_ID
+
+  - name: gcr.io/cloud-builders/gcloud
+    entrypoint: bash
+    args:
+      - -c
+      - >-
+        sed -i
+        "s|questions-api:local|${_REGION}-docker.pkg.dev/$PROJECT_ID/${_AR_REPOSITORY}/questions-api:$BUILD_ID|"
+        QuestionsApi/k8s/questions-api.yaml
+
+  - name: gcr.io/cloud-builders/kubectl
+    args:
+      - apply
+      - -f
+      - QuestionsApi/k8s/
+    env:
+      - CLOUDSDK_COMPUTE_REGION=${_CLUSTER_LOCATION}
+      - CLOUDSDK_CONTAINER_CLUSTER=${_CLUSTER_NAME}
+
+images:
+  - ${_REGION}-docker.pkg.dev/$PROJECT_ID/${_AR_REPOSITORY}/questions-api:$BUILD_ID

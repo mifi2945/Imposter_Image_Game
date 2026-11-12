@@ -40,7 +40,7 @@ async def get_questions():
 
 
 @router.delete("/{question_id}", 
-               response_code=status.HTTP_204_NO_CONTENT,
+               status_code=status.HTTP_204_NO_CONTENT,
                responses={
                        401: {"model": ErrorMessage, "description": "Unauthorized"},
                        403: {"model": ErrorMessage, "description": "Operation forbidden"},

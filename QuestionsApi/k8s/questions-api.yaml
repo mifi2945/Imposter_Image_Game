@@ -1,0 +1,68 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: questions-api
+  namespace: questions
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: questions-api
+  template:
+    metadata:
+      labels:
+        app: questions-api
+    spec:
+      containers:
+        - name: questions-api
+          image: questions-api:local
+          ports:
+            - name: http
+              containerPort: 8080
+          env:
+            - name: PGHOST
+              value: postgres
+            - name: PGPORT
+              value: "5432"
+            - name: PGDATABASE
+              value: questions
+            - name: PGUSER
+              value: questions
+            - name: PGPASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: questions-db-credentials
+                  key: POSTGRES_PASSWORD
+          readinessProbe:
+            httpGet:
+              path: /
+              port: http
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          livenessProbe:
+            httpGet:
+              path: /
+              port: http
+            initialDelaySeconds: 15
+            periodSeconds: 10
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: questions-api
+  namespace: questions
+spec:
+  type: ClusterIP
+  selector:
+    app: questions-api
+  ports:
+    - name: http
+      port: 80
+      targetPort: http

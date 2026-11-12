@@ -1,5 +1,5 @@
 import fastapi
-from routes import questions
+from routes import questions_router as questions
 
 app = fastapi.FastAPI()
 
