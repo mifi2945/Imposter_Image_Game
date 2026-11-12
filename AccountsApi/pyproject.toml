@@ -1,0 +1,15 @@
+[project]
+name = "accountsapi"
+version = "0.1.0"
+description = "Accounts API for Imposter Image Game"
+requires-python = ">=3.13"
+dependencies = [
+    "fastapi>=0.162.5",
+    "google-cloud-firestore>=2.34.1",
+]
+
+[dependency-groups]
+dev = [
+    "fastapi-cli>=0.0.33",
+    "pytest>=9.2.0",
+]
