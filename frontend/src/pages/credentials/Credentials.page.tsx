@@ -32,7 +32,12 @@ export function CredentialsPage() {
     }
 
     useEffect(() => {
-        navigate("/lobbies");
+        if (accessToken) {
+            navigate("/lobbies");
+            setUsername("");
+            setPassword("");
+            clearError();
+        }
     }, [accessToken]);
 
     return (
