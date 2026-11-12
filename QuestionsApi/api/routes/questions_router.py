@@ -1,5 +1,11 @@
 from fastapi import APIRouter, HTTPException, status
-from objects.question import Question, RoundQuestion
+from database import create_question as insert_question
+from database import delete_question as remove_question
+from database import get_questions as select_questions
+from database import get_random_question as select_random_question
+from database import get_random_category as select_random_category
+from database import random_question as select_random_question
+from objects.question import Question, QuestionCreate, RoundQuestion
 from pydantic import BaseModel
 
 class ErrorMessage(BaseModel):
@@ -12,31 +18,30 @@ router = APIRouter(
 )
 
 @router.post("/", 
+    status_code=status.HTTP_201_CREATED,
+    response_model=Question,
     responses={
         201: {"description": "Question created successfully"},
         400: {"model": ErrorMessage, "description": "Invalid request body or failed validation"},
         401: {"model": ErrorMessage, "description": "Unauthorized"},
         403: {"model": ErrorMessage, "description": "Operation forbidden"}})
-async def create_question(question: Question):
+async def create_question(question: QuestionCreate):
     """
     Create a new question.
     """
-    # TODO
-    raise HTTPException(status_code=400, detail="Invalid request body or failed validation")
-    return {"message": "Question created successfully", "question": question}
+    return await insert_question(question.category, question.question)
 
 
-@router.get("/", 
+@router.get("/",
             response_model=list[Question],
             responses={200: {"description": "Questions retrieved successfully"},
                        401: {"model": ErrorMessage, "description": "Unauthorized"},
                        403: {"model": ErrorMessage, "description": "Operation forbidden"}})
-async def get_questions():
+async def get_questions(category: str | None = None):
     """
     Get all questions.
     """
-    # TODO
-    return []
+    return await select_questions(category)
 
 
 @router.delete("/{question_id}", 
@@ -49,9 +54,11 @@ async def delete_question(question_id: int):
     """
     Delete a question by ID.
     """
-    # TODO
-    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Question with ID {question_id} not found")
-    return {"message": f"Question with ID {question_id} deleted successfully"}
+    if not await remove_question(question_id):
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Question with ID {question_id} not found",
+        )
 
 
 @router.get("/round",
@@ -67,5 +74,9 @@ async def get_question_for_round():
     # Gives 1 question for impostor
     # Body: category (string)
     # TODO
-    raise HTTPException(status_code=status.HTTP_418_IM_A_TEAPOT, detail="I'm a teapot")
-    return RoundQuestion()
+    category : str = await select_random_category()
+    imposter_question : Question = await select_random_question(category)
+    non_impostor_question : Question = imposter_question
+    while non_impostor_question.id == imposter_question.id:
+        non_impostor_question = await select_random_question(category)
+    return RoundQuestion(imposter_question=imposter_question, non_impostor_question=non_impostor_question)

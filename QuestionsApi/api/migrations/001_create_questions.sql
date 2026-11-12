@@ -1,0 +1,5 @@
+CREATE TABLE questions (
+    id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    category TEXT NOT NULL,
+    question TEXT NOT NULL
+);

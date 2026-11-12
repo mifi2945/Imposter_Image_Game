@@ -3,7 +3,9 @@
 These manifests deploy the Questions API and a single-replica PostgreSQL
 StatefulSet with a persistent volume claim. They do not create a GKE cluster.
 The API currently receives PostgreSQL connection settings as environment
-variables, but its routes do not yet read from the database.
+variables. On startup it applies any unapplied SQL files in
+`QuestionsApi/api/migrations/`; the create, list, and delete endpoints use
+PostgreSQL.
 
 ## Local Kubernetes
 

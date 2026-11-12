@@ -1,5 +1,9 @@
 from pydantic import BaseModel
 
+class QuestionCreate(BaseModel):
+    category: str
+    question: str
+
 class Question(BaseModel):
     id: int
     category: str
