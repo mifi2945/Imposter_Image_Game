@@ -15,3 +15,6 @@ dev = [
     "fastapi-cli>=0.0.33",
     "pytest>=9.2.0",
 ]
+
+[tool.pytest.ini_options]
+pythonpath = [".."]

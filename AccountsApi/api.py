@@ -4,9 +4,9 @@ from google.cloud import firestore
 import os
 import datetime
 
-from type import Account, AccountStat, AccountDB
-from pw_access import hash_password, verify_password
-from token_access import Token
+from AccountsApi.type import Account, AccountStat, AccountDB
+from AccountsApi.pw_access import hash_password, verify_password
+from AccountsApi.token_access import Token
 
 app = FastAPI()
 bearer_scheme = HTTPBearer()

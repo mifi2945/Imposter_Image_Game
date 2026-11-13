@@ -25,7 +25,7 @@ class Token:
         now = datetime.datetime.now(datetime.timezone.utc)
         claims = {
             "sub": user,
-            "exp": (now + datetime.timedelta(minutes=15)).isoformat(),
+            "exp": now + datetime.timedelta(minutes=15),
             "role": role
         }
         return jwt.encode(claims, PRIVATE_KEY, algorithm=ALG)
