@@ -4,8 +4,10 @@ version = "0.1.0"
 description = "Accounts API for Imposter Image Game"
 requires-python = ">=3.13"
 dependencies = [
+    "argon2-cffi>=25.1.0",
     "fastapi>=0.162.5",
     "google-cloud-firestore>=2.34.1",
+    "pyjwt>=2.15.1",
 ]
 
 [dependency-groups]

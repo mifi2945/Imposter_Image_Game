@@ -8,3 +8,8 @@ class Account(BaseModel):
 class AccountStat(BaseModel):
     username: str = Field(min_length=3, max_length=111, pattern=r'^\w+$')
     points: int = Field(ge=0)
+
+class AccountDB(BaseModel):
+    password: str
+    refresh_token: str
+    expires: str
