@@ -1,0 +1,40 @@
+# Copyright 2020 Google LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+substitutions:
+  _REGION: us-central1
+  _ARTIFACT_REGISTRY_REPO: imposter-repo
+  _SERVICE: accounts-api
+  _CLUSTER_NAME: imposter-cluster
+  _ACCOUNTS_ROOT: AccountsApi
+
+steps:
+# Install dependencies and run unit tests
+- name: 'python:3.13-slim'
+  entrypoint: bash
+  args:
+  - '-c'
+  - |
+    python -m pip install uv
+    cd ${_ACCOUNTS_ROOT}
+    uv sync --freeze
+    uv run pytest
+
+# Docker Build
+- name: 'gcr.io/cloud-builders/docker'
+  args: ['build', '-t',
+          '${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_ARTIFACT_REGISTRY_REPO}/${_SERVICE}:${BUILD_ID}', '${_ACCOUNTS_ROOT}']
+
+# Push the image before deploying it
+- name: 'gcr.io/cloud-builders/docker'
+  args:
+  - push
+  - ${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_ARTIFACT_REGISTRY_REPO}/${_SERVICE}:${BUILD_ID}
+
+# Store images in Google Artifact Registry
+images:
+- ${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_ARTIFACT_REGISTRY_REPO}/${_SERVICE}:${BUILD_ID}
+
+# options
+options:
+  logging: CLOUD_LOGGING_ONLY
