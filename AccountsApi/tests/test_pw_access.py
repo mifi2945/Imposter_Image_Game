@@ -1,4 +1,4 @@
-from AccountsApi.pw_access import hash_password, verify_password
+from AccountsApi.src.pw_access import hash_password, verify_password
 
 
 def test_hash_password_returns_argon2_hash():

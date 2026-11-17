@@ -3,7 +3,7 @@ import hashlib
 
 import jwt
 
-from AccountsApi.token_access import ALG, PRIVATE_KEY, Token
+from AccountsApi.src.token_access import ALG, PRIVATE_KEY, Token
 
 def test_get_public_key_returns_configured_public_key():
     assert Token.get_public_key()
