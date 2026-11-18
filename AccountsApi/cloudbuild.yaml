@@ -7,12 +7,36 @@ substitutions:
   _SERVICE: accounts-api
   _CLUSTER_NAME: imposter-cluster
   _WORK_DIR: AccountsApi
+  _PRIVATE_KEY_PATH: keys/ec_private.pem
+  _PUBLIC_KEY_PATH: keys/ec_public.pem
+  _KEY_ALGORITHM: ES256
+
+availableSecrets:
+  secretManager:
+  - versionName: projects/${PROJECT_ID}/secrets/accountsapi-es-public/versions/latest
+    env: 'PUBLIC_KEY'
+  - versionName: projects/${PROJECT_ID}/secrets/accountsapi-es-private/versions/latest
+    env: 'PRIVATE_KEY'
 
 steps:
+# Set up secrets
+- name: 'bash'
+  dir: '${_WORK_DIR}'
+  secretEnv:
+  - 'PUBLIC_KEY'
+  - 'PRIVATE_KEY'
+  script: |
+    #!/usr/bin/env bash
+    echo "$$PUBLIC_KEY" > ${_PUBLIC_KEY_PATH}
+    echo "$$PRIVATE_KEY" > ${_PRIVATE_KEY_PATH}
+
 # Install dependencies and run unit tests
 - name: 'python:3.13-slim'
   dir: '${_WORK_DIR}'
   entrypoint: bash
+  env:
+  - 'PRIVATE_KEY_PATH=${_PRIVATE_KEY_PATH}'
+  - 'PUBLIC_KEY_PATH=${_PUBLIC_KEY_PATH}'
   args:
   - '-c'
   - |
