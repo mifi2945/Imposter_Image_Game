@@ -25,8 +25,9 @@ steps:
   secretEnv:
   - 'PUBLIC_KEY'
   - 'PRIVATE_KEY'
-  script: |
-    #!/usr/bin/env bash
+  args:
+  - '-c'
+  - |
     echo "$$PUBLIC_KEY" > ${_PUBLIC_KEY_PATH}
     echo "$$PRIVATE_KEY" > ${_PRIVATE_KEY_PATH}
 
