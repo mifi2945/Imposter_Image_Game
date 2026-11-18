@@ -28,6 +28,7 @@ steps:
   args:
   - '-c'
   - |
+    mkdir -p "$(dirname "${_PUBLIC_KEY_PATH}")"
     echo "$$PUBLIC_KEY" > ${_PUBLIC_KEY_PATH}
     echo "$$PRIVATE_KEY" > ${_PRIVATE_KEY_PATH}
 
