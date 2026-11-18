@@ -3,7 +3,7 @@
 # Licensed under the Apache License, Version 2.0 (the "License");
 substitutions:
   _REGION: us-central1
-  _ARTIFACT_REGISTRY_REPO: imposter-repo
+  _ARTIFACT_REGISTRY_REPO: impostor-repo
   _SERVICE: accounts-api
   _CLUSTER_NAME: imposter-cluster
   _WORK_DIR: AccountsApi
@@ -43,7 +43,7 @@ steps:
   - '-c'
   - |
     python -m pip install uv
-    uv sync --freeze
+    uv sync --frozen
     uv run pytest
 
 # Docker Build
