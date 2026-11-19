@@ -1,9 +1,8 @@
+import { TokenRequest, TokenResponse } from "./auth.hub";
+import { getServiceUrls } from "./service-urls";
 // API hub. This file contains helper functions which will make calling our api easier.
 import { tokenHelpers } from "~/helpers";
 import { type State, type Store } from "~/redux";
-import { TokenRequest, TokenResponse } from "./auth.hub";
-
-const apiBaseUrl = "TODO";
 
 class HttpError extends Error {
     public readonly status: number;
@@ -43,7 +42,7 @@ function getStore() {
 async function getRefreshedTokens(refreshToken: string) {
     // unfortunately we have to call this manually with fetch
     // to avoid circular dependency
-    const response = await fetch(`${apiBaseUrl}/auth/token`, {
+    const response = await fetch(`${getServiceUrls().accounts}/auth/token`, {
         method: "POST",
         body: JSON.stringify({
             refreshToken,
@@ -62,7 +61,7 @@ async function getRefreshedTokens(refreshToken: string) {
 
 function buildHeaders(accessToken: string) {
     return {
-        "Conent-Type": "application/json",
+        "Content-Type": "application/json",
         ...(accessToken && { Authorization: `Bearer ${accessToken}` }),
     };
 }
@@ -80,7 +79,7 @@ function buildBody(body: object | string | undefined) {
 
 export async function executeRequest(request: RequestOptions) {
     const {
-        baseUrl = apiBaseUrl,
+        baseUrl = getServiceUrls().accounts,
         endpoint,
         method = "GET",
         authorization = "Bearer",

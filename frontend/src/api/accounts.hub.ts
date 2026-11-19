@@ -1,5 +1,6 @@
-import { Account } from "~/models";
 import { send } from "./hub";
+import { getServiceUrls } from "./service-urls";
+import { Account } from "~/models";
 
 export interface GetAccountResponse {
     account: Account;
@@ -7,6 +8,7 @@ export interface GetAccountResponse {
 
 export async function getAccount() {
     return await send<GetAccountResponse>({
+        baseUrl: getServiceUrls().accounts,
         endpoint: "/accounts/me",
     });
 }

@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { Account, AccountRole } from "~/models";
 import { getAccount, signIn, signUp } from "./auth.thunks";
+import { Account, AccountRole } from "~/models";
 
 // The redux store is a centralized place for all the data in our app.
 // A slice is like one section of the redux store.
@@ -66,12 +66,12 @@ const slice = createSlice({
                 state.isLoading = true;
             })
             .addCase(signIn.fulfilled, (state, action) => {
-                const { accessToken, refreshToken, account } = action.payload;
+                const { accessToken, refreshToken } = action.payload;
 
                 state.isLoading = false;
                 state.accessToken = accessToken;
                 state.refreshToken = refreshToken;
-                state.account = account;
+                state.account.username = action.meta.arg.username;
 
                 state.errorMessage = "";
             })
@@ -84,12 +84,12 @@ const slice = createSlice({
                 state.isLoading = true;
             })
             .addCase(signUp.fulfilled, (state, action) => {
-                const { accessToken, refreshToken, account } = action.payload;
+                const { accessToken, refreshToken } = action.payload;
 
                 state.isLoading = false;
                 state.accessToken = accessToken;
                 state.refreshToken = refreshToken;
-                state.account = account;
+                state.account.username = action.meta.arg.username;
 
                 state.errorMessage = "";
             })

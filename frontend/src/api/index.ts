@@ -3,3 +3,4 @@ export * as authHub from "./auth.hub";
 export * as lobbyHub from "./lobby.hub";
 export * as questionsHub from "./questions.hub";
 export * from "./hub";
+export { getServiceUrls } from "./service-urls";
