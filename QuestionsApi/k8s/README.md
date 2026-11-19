@@ -40,6 +40,11 @@ somewhere safe; do not commit it to the repository.
 
 ## GKE deployment
 
+Cloud Build deploys to GKE; it does not deploy to Cloud Run. Create the GKE
+cluster and Artifact Registry repository in the same Google Cloud project, and
+grant the Cloud Build service account permission to push images and deploy
+workloads to the cluster.
+
 After creating a regional GKE cluster, configure kubectl to use it:
 
 ```sh
@@ -56,9 +61,9 @@ kubectl -n questions create secret generic questions-db-credentials \
   --from-literal=POSTGRES_PASSWORD="$(openssl rand -base64 32)"
 ```
 
-Create the Artifact Registry repository and a GKE cluster in the same project.
-The Cloud Build service account needs permission to push images and deploy to
-that cluster. Then submit from the repository root:
+Create the `imposter-repo` Artifact Registry repository in `us-central1` (or
+change the substitutions in `cloudbuild.yaml`). Then submit from the
+repository root:
 
 ```sh
 gcloud builds submit --config=QuestionsApi/cloudbuild.yaml \
@@ -67,6 +72,10 @@ gcloud builds submit --config=QuestionsApi/cloudbuild.yaml \
 
 Set `_REGION` and `_AR_REPOSITORY` in `cloudbuild.yaml` to match the Artifact
 Registry repository. `_CLUSTER_LOCATION` should match the GKE cluster's region.
+Before each environment's first build, create the
+`questions-db-credentials` Secret in the `questions` namespace. Cloud Build
+applies the namespace and Postgres StatefulSet, waits for Postgres to become
+ready, and then deploys the API.
 
 The Kubernetes database uses a 1 GiB persistent volume claim; it is a single
 instance and does not include automated backups or high availability.

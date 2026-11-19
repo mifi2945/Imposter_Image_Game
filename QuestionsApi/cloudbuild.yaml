@@ -32,7 +32,36 @@ steps:
     args:
       - apply
       - -f
-      - QuestionsApi/k8s/
+      - QuestionsApi/k8s/00-namespace.yaml
+    env:
+      - CLOUDSDK_COMPUTE_REGION=${_CLUSTER_LOCATION}
+      - CLOUDSDK_CONTAINER_CLUSTER=${_CLUSTER_NAME}
+
+  - name: gcr.io/cloud-builders/kubectl
+    args:
+      - apply
+      - -f
+      - QuestionsApi/k8s/postgres.yaml
+    env:
+      - CLOUDSDK_COMPUTE_REGION=${_CLUSTER_LOCATION}
+      - CLOUDSDK_CONTAINER_CLUSTER=${_CLUSTER_NAME}
+
+  - name: gcr.io/cloud-builders/kubectl
+    args:
+      - rollout
+      - status
+      - statefulset/postgres
+      - --namespace=questions
+      - --timeout=180s
+    env:
+      - CLOUDSDK_COMPUTE_REGION=${_CLUSTER_LOCATION}
+      - CLOUDSDK_CONTAINER_CLUSTER=${_CLUSTER_NAME}
+
+  - name: gcr.io/cloud-builders/kubectl
+    args:
+      - apply
+      - -f
+      - QuestionsApi/k8s/questions-api.yaml
     env:
       - CLOUDSDK_COMPUTE_REGION=${_CLUSTER_LOCATION}
       - CLOUDSDK_CONTAINER_CLUSTER=${_CLUSTER_NAME}
