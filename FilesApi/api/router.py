@@ -1,3 +1,5 @@
+import os
+
 import logging
 from uuid import UUID, uuid4
 
@@ -8,9 +10,20 @@ from google.api_core.exceptions import GoogleAPICallError, NotFound
 from pydantic import BaseModel, Field
 
 from .storage import ImageStore, get_image_store
+from fastapi.middleware.cors import CORSMiddleware
 
 
 app = FastAPI(title="Files Service")
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        origin.strip()
+        for origin in os.environ.get("CORS_ORIGINS", "").split(",")
+        if origin.strip()
+    ],
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 logger = logging.getLogger(__name__)
 
 MAX_IMAGE_BYTES = 10 * 1024 * 1024 # 10 Mibs
