@@ -1,5 +1,3 @@
-"""Cloud Storage access for game images."""
-
 import os
 from functools import lru_cache
 from uuid import UUID
@@ -41,7 +39,7 @@ class ImageStore:
 
 
 @lru_cache
-def get_image_store() -> ImageStore:
+def get_image_store() -> ImageStore: # Singleton
     bucket_name = os.environ.get("FILES_BUCKET_NAME")
     if not bucket_name:
         raise RuntimeError("FILES_BUCKET_NAME must name the Cloud Storage bucket")
