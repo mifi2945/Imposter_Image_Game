@@ -34,7 +34,7 @@ spec:
       serviceAccountName: "accounts-api"
       containers:
       - name: "accounts-api"
-        image: "accounts-api:local"
+        image: "us-central1-docker.pkg.dev/impostor-image-game-514519/impostor-repo/accounts-api:latest"
         ports:
         - name: http
           containerPort: 8000
@@ -81,7 +81,7 @@ spec:
     kind: "Deployment"
     name: "accounts-api"
     apiVersion: "apps/v1"
-  minReplicas: 0
+  minReplicas: 1
   maxReplicas: 3
   metrics:
   - type: "Resource"
