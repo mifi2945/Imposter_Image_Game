@@ -26,6 +26,8 @@ Create the namespace and database Secret, then deploy the manifests:
 kubectl apply -f QuestionsApi/k8s/00-namespace.yaml
 kubectl -n questions create secret generic questions-db-credentials \
   --from-literal=POSTGRES_PASSWORD="$(openssl rand -base64 32)"
+kubectl -n questions create secret generic accountsapi-es-public \
+  --from-file=public-key.pem=/path/to/ec_public.pem
 kubectl apply -f QuestionsApi/k8s/
 ```
 
@@ -61,6 +63,21 @@ kubectl -n questions create secret generic questions-db-credentials \
   --from-literal=POSTGRES_PASSWORD="$(openssl rand -base64 32)"
 ```
 
+Cloud Build copies the Accounts API ES256 public key from Google Secret Manager
+into the `accountsapi-es-public` Kubernetes Secret on each deployment. Grant
+the Cloud Build service account access to that secret:
+
+```sh
+gcloud secrets add-iam-policy-binding accountsapi-es-public \
+  --project=YOUR_GCP_PROJECT_ID \
+  --member="serviceAccount:YOUR_CLOUD_BUILD_SERVICE_ACCOUNT" \
+  --role=roles/secretmanager.secretAccessor
+```
+
+The Questions API reads the key from the mounted Kubernetes Secret. To rotate
+the key, add a new version to Google Secret Manager and run the Cloud Build
+pipeline again.
+
 Create the `imposter-repo` Artifact Registry repository in `us-central1` (or
 change the substitutions in `cloudbuild.yaml`). Then submit from the
 repository root:
@@ -73,9 +90,10 @@ gcloud builds submit --config=QuestionsApi/cloudbuild.yaml \
 Set `_REGION` and `_AR_REPOSITORY` in `cloudbuild.yaml` to match the Artifact
 Registry repository. `_CLUSTER_LOCATION` should match the GKE cluster's region.
 Before each environment's first build, create the
-`questions-db-credentials` Secret in the `questions` namespace. Cloud Build
-applies the namespace and Postgres StatefulSet, waits for Postgres to become
-ready, and then deploys the API.
+`questions-db-credentials` Secret in the `questions` namespace. The
+`accountsapi-es-public` Kubernetes Secret is synced from Google Secret Manager
+by Cloud Build. Cloud Build applies the namespace and Postgres StatefulSet,
+waits for Postgres to become ready, and then deploys the API.
 
 The Kubernetes database uses a 1 GiB persistent volume claim; it is a single
 instance and does not include automated backups or high availability.
