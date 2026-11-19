@@ -1,4 +1,4 @@
-import { createSlice } from "@reduxjs/toolkit";
+import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
 import { Lobby } from "~/models/lobby.model";
 import { getLobbies } from "./lobby.thunks";
 
@@ -6,12 +6,14 @@ export interface LobbyState {
     isLoading: boolean;
     errorMessage: string | undefined;
     lobbies: Lobby[];
+    currentLobby: Lobby | null;
 }
 
 const initialState: LobbyState = {
     isLoading: false,
     errorMessage: "",
     lobbies: [],
+    currentLobby: null,
 };
 
 const slice = createSlice({
@@ -23,6 +25,9 @@ const slice = createSlice({
         },
         clearError(state) {
             state.errorMessage = "";
+        },
+        setCurrentLobby(state, action: PayloadAction<Lobby | null>) {
+            state.currentLobby = action.payload;
         },
     },
     extraReducers: (builder) => {

@@ -1,11 +1,13 @@
 import { combineReducers, configureStore } from "@reduxjs/toolkit";
 import { AuthState, authSlice } from "~/redux/auth.slice";
+import { gameSlice, GameState } from "~/redux/game.slice";
 import { lobbySlice, LobbyState } from "./lobby.slice";
 import { questionsSlice, QuestionsState } from "./questions.slice";
 
 // Each time a new slice is added, you need to add the State here...
 export interface State {
     auth: AuthState;
+    game: GameState;
     lobby: LobbyState;
     questions: QuestionsState;
 }
@@ -13,6 +15,7 @@ export interface State {
 // and the reducers here.
 export const rootReducer = combineReducers({
     [authSlice.name]: authSlice.reducer,
+    [gameSlice.name]: gameSlice.reducer,
     [lobbySlice.name]: lobbySlice.reducer,
     [questionsSlice.name]: questionsSlice.reducer,
 });
