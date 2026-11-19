@@ -52,7 +52,7 @@ steps:
       - status
       - statefulset/postgres
       - --namespace=questions
-      - --timeout=180s
+      - --timeout=240s
     env:
       - CLOUDSDK_COMPUTE_REGION=${_CLUSTER_LOCATION}
       - CLOUDSDK_CONTAINER_CLUSTER=${_CLUSTER_NAME}
