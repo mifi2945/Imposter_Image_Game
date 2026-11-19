@@ -114,10 +114,10 @@ metadata:
   name: accounts-api-keys
   namespace: accounts
 spec:
-  provider: gcp
+  provider: gke
   parameters:
     secrets: |
       - resourceName: "projects/impostor-image-game-514519/secrets/accountsapi-es-private/versions/latest"
-        fileName: "ec_private.pem"
+        path: "ec_private.pem"
       - resourceName: "projects/impostor-image-game-514519/secrets/accountsapi-es-public/versions/latest"
-        fileName: "ec_public.pem"
+        path: "ec_public.pem"
