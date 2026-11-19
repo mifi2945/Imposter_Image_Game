@@ -37,6 +37,8 @@ spec:
           env:
             - name: POSTGRES_DB
               value: questions
+            - name: PGDATA
+              value: /var/lib/postgresql/data/pgdata
             - name: POSTGRES_USER
               value: questions
             - name: POSTGRES_PASSWORD
