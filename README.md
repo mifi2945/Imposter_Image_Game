@@ -5,6 +5,29 @@ Alex Ewart, Mikhail Filippov, Liam Otten, Oskar Sierzega
 
 [here](https://lucid.app/lucidspark/6aee173d-5052-468c-a86d-204b46e9f262/edit?viewport_loc=928%2C-2633%2C4257%2C2357%2C0_0&invitationId=inv_abb56715-4ca7-4596-b18d-1a0e54b831ec) is the design whiteboard (lucidspark).
 
+## Local development
+
+Start the frontend and backend services, along with their local data stores:
+
+```sh
+docker compose up --build
+```
+
+Open the Vite development server at <http://localhost:5173>. Frontend source
+changes are picked up automatically. The APIs are available locally at:
+
+| Service | URL |
+| --- | --- |
+| Accounts API | <http://localhost:8000/docs> |
+| Orchestrator API | <http://localhost:8002/docs> |
+| Files API | <http://localhost:8003/docs> |
+| Lobby API | <http://localhost:8004/docs> |
+| Questions API | <http://localhost:8005/docs> |
+
+Firestore, PostgreSQL, and Redis run locally in Compose; the accounts service
+uses generated development signing keys. Stop the services with
+`docker compose down`. PostgreSQL and Redis data are kept in Docker volumes.
+
 Game Flow
 1. Game starts
 2. Main Loop
