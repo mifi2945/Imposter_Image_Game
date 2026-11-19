@@ -1,6 +1,6 @@
 substitutions:
   _REGION: us-central1
-  _AR_REPOSITORY: imposter-repo
+  _AR_REPOSITORY: impostor-repo
   _CLUSTER_NAME: questions-cluster
   _CLUSTER_LOCATION: us-central1
 
