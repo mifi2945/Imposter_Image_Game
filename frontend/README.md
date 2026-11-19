@@ -1,5 +1,23 @@
 # Mantine Vite template
 
+## Container deployment
+
+Build and run the frontend locally from the repository root:
+
+```sh
+docker build -t frontend:local frontend
+docker run --rm -p 8080:8080 frontend:local
+```
+
+Submit a Cloud Build deployment from the repository root:
+
+```sh
+gcloud builds submit --config=frontend/cloudbuild.yaml .
+```
+
+The Kubernetes Service is internal (`ClusterIP`); expose it through your
+cluster's ingress or gateway to make the frontend available outside the cluster.
+
 ## Features
 
 This template comes with the following features:

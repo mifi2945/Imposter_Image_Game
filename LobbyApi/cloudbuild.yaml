@@ -1,7 +1,7 @@
 substitutions:
   _REGION: us-central1
-  _AR_REPOSITORY: imposter-repo
-  _CLUSTER_NAME: questions-cluster
+  _AR_REPOSITORY: impostor-repo
+  _CLUSTER_NAME: imposter-cluster
   _CLUSTER_LOCATION: us-central1
 
 steps:
@@ -52,7 +52,7 @@ steps:
       - status
       - statefulset/redis
       - --namespace=lobbies
-      - --timeout=180s
+      - --timeout=240s
     env:
       - CLOUDSDK_COMPUTE_REGION=${_CLUSTER_LOCATION}
       - CLOUDSDK_CONTAINER_CLUSTER=${_CLUSTER_NAME}
