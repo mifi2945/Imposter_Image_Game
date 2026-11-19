@@ -66,6 +66,10 @@ async def sign_in(account: Account):
 async def get_public_key():
     return Token.get_public_key()
 
+@app.get("/health")
+async def health_check():
+    return "I'm alive"
+
 
 
 # @app.get("/test_db")

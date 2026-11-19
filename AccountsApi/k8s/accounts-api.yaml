@@ -1,0 +1,110 @@
+---
+apiVersion: "v1"
+kind: "Namespace"
+metadata:
+  name: "accounts"
+  annotations:
+    iam.gke.io/gcp-service-account: accounts-api-runner@impostor-image-game-514519.iam.gserviceaccount.com
+---
+apiVersion: "apps/v1"
+kind: "Deployment"
+metadata:
+  name: "accounts-api"
+  namespace: "accounts"
+  labels:
+    app: "accounts-api"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: "accounts-api"
+  template:
+    metadata:
+      labels:
+        app: "accounts-api"
+    spec:
+      containers:
+      - name: "accounts-api"
+        image: "accounts-api:local"
+        ports:
+        - name: http
+          containerPort: 8000
+        env:
+        - name: PRIVATE_KEY_PATH
+          value: /var/secrets/accounts/ec_private.pem
+        - name: PUBLIC_KEY_PATH
+          value: /var/secrets/accounts/ec_public.pem
+        - name: KEY_ALGORITHM
+          value: ES256
+        volumeMounts:
+        - name: accounts-api-keys
+          mountPath: /var/secrets/accounts
+          readOnly: true
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: http
+          initialDelaySeconds: 2
+          periodSeconds: 180
+      volumes:
+      - name: accounts-api-keys
+        csi:
+          driver: secrets-store.csi.k8s.io
+          readOnly: true
+          volumeAttributes:
+            secretProviderClass: accounts-api-keys
+      nodeSelector:
+        cloud.google.com/compute-class: "default"
+---
+apiVersion: "autoscaling/v2"
+kind: "HorizontalPodAutoscaler"
+metadata:
+  name: "accounts-api-hpa-xacp"
+  namespace: "accounts"
+  labels:
+    app: "accounts-api"
+spec:
+  scaleTargetRef:
+    kind: "Deployment"
+    name: "accounts-api"
+    apiVersion: "apps/v1"
+  minReplicas: 0
+  maxReplicas: 3
+  metrics:
+  - type: "Resource"
+    resource:
+      name: "cpu"
+      target:
+        type: "Utilization"
+        averageUtilization: 90
+---
+apiVersion: "v1"
+kind: "Service"
+metadata:
+  name: "accounts-api-service"
+  namespace: "accounts"
+  labels:
+    app: "accounts-api"
+spec:
+  ports:
+  - protocol: "TCP"
+    port: 8000
+    targetPort: 8000
+  selector:
+    app: "accounts-api"
+  type: "LoadBalancer"
+  loadBalancerIP: ""
+---
+apiVersion: secrets-store.csi.x-k8s.io/v1
+kind: SecretProviderClass
+metadata:
+  name: accounts-api-keys
+  namespace: accounts
+spec:
+  provider: gcp
+  parameters:
+    secrets: |
+      - resourceName: "projects/impostor-image-game-514519/secrets/accountsapi-es-private/versions/latest"
+        fileName: "ec_private.pem"
+      - resourceName: "projects/impostor-image-game-514519/secrets/accountsapi-es-public/versions/latest"
+        fileName: "ec_public.pem"

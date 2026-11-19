@@ -59,6 +59,15 @@ steps:
   - push
   - ${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_ARTIFACT_REGISTRY_REPO}/${_SERVICE}:${BUILD_ID}
 
+- name: 'gcr.io/cloud-builders/gke-deploy'
+  dir: '${_WORK_DIR}'
+  args:
+  - 'run'
+  - '--filename=k8s/accounts-api.yaml'
+  - '--image=${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_ARTIFACT_REGISTRY_REPO}/${_SERVICE}:${BUILD_ID}'
+  - '--location=${_REGION}'
+  - '--cluster=${_CLUSTER_NAME}'
+
 # Store images in Google Artifact Registry
 images:
 - ${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_ARTIFACT_REGISTRY_REPO}/${_SERVICE}:${BUILD_ID}
