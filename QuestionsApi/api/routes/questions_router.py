@@ -4,7 +4,6 @@ from database import delete_question as remove_question
 from database import get_questions as select_questions
 from database import get_random_question as select_random_question
 from database import get_random_category as select_random_category
-from database import random_question as select_random_question
 from objects.question import Question, QuestionCreate, RoundQuestion
 from pydantic import BaseModel
 
