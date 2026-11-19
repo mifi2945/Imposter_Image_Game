@@ -41,7 +41,7 @@ services:
       CORS_ORIGINS: http://localhost:5173,http://127.0.0.1:5173
     depends_on:
       firestore:
-        condition: service_started
+        condition: service_healthy
 
   files-api:
     build:
@@ -89,16 +89,23 @@ services:
         condition: service_healthy
 
   firestore:
-    image: gcr.io/google.com/cloudsdktool/google-cloud-cli:emulators
-    command:
-      - gcloud
-      - emulators
-      - firestore
-      - start
-      - --host-port=0.0.0.0:8085
-      - --project=local-dev
+    build:
+      context: .
+      dockerfile: Dockerfile.firebase-emulator
     ports:
       - "8085:8085"
+      - "4000:4000"
+    volumes:
+      - firestore_data:/data
+    healthcheck:
+      test:
+        - CMD
+        - node
+        - -e
+        - "fetch('http://127.0.0.1:8085').then((r) => process.exit(r.status < 500 ? 0 : 1)).catch(() => process.exit(1))"
+      interval: 5s
+      timeout: 3s
+      retries: 20
 
   postgres:
     image: postgres:17-alpine
@@ -131,5 +138,6 @@ services:
 
 volumes:
   frontend_node_modules:
+  firestore_data:
   postgres_data:
   redis_data:

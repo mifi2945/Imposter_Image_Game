@@ -23,10 +23,13 @@ changes are picked up automatically. The APIs are available locally at:
 | Files API | <http://localhost:8003/docs> |
 | Lobby API | <http://localhost:8004/docs> |
 | Questions API | <http://localhost:8005/docs> |
+| Firestore Emulator UI | <http://localhost:4000> |
 
-Firestore, PostgreSQL, and Redis run locally in Compose; the accounts service
-uses generated development signing keys. Stop the services with
-`docker compose down`. PostgreSQL and Redis data are kept in Docker volumes.
+Firestore, PostgreSQL, and Redis run locally in Compose; inspect and edit
+Firestore documents in the Emulator UI. The emulator imports and exports its
+data to a Docker volume, so it persists across container restarts. The accounts
+service uses generated development signing keys. Stop the services with
+`docker compose down`. PostgreSQL and Redis data are also kept in Docker volumes.
 The APIs allow the local Vite origins for browser requests; deployments should
 set each API's `CORS_ORIGINS` to the frontend's public origin.
 
