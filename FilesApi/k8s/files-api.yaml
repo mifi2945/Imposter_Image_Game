@@ -1,0 +1,54 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: files-api
+  namespace: files
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: files-api
+  template:
+    metadata:
+      labels:
+        app: files-api
+    spec:
+      containers:
+        - name: files-api
+          image: files-api:local
+          ports:
+            - name: http
+              containerPort: 8080
+          readinessProbe:
+            httpGet:
+              path: /
+              port: http
+            initialDelaySeconds: 2
+            periodSeconds: 5
+          livenessProbe:
+            httpGet:
+              path: /
+              port: http
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: files-api
+  namespace: files
+spec:
+  type: ClusterIP
+  selector:
+    app: files-api
+  ports:
+    - name: http
+      port: 80
+      targetPort: http

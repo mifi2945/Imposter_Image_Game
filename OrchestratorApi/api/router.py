@@ -1,11 +1,6 @@
-from enum import Enum
-from uuid import UUID
-
 from fastapi import APIRouter, FastAPI, HTTPException, status
-from pydantic import BaseModel, Field
-from models import *
 
-
+from .models import UploadEvent
 
 app = FastAPI(title="Orchestration Service")
 
@@ -18,7 +13,6 @@ vote_router = APIRouter(prefix="/votes", tags=["Votes"])
 @home_router.get("/")
 async def read_root():
     return {"service": "orchestration", "status": "ok"}
-
 
 
 @message_router.post("/image", status_code=status.HTTP_501_NOT_IMPLEMENTED)
@@ -83,5 +77,4 @@ app.include_router(home_router)
 app.include_router(message_router)
 app.include_router(game_router)
 app.include_router(vote_router)
-
 

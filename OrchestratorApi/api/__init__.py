@@ -1,1 +1,1 @@
-"""Recommendation API package."""
+"""Game orchestration API package."""

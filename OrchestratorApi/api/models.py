@@ -1,9 +1,7 @@
 from enum import Enum
 from uuid import UUID
 
-from fastapi import APIRouter, FastAPI, HTTPException, status
 from pydantic import BaseModel, Field
-
 
 
 class Player(BaseModel):

@@ -1,0 +1,10 @@
+[project]
+name = "orchestrator-api"
+version = "0.1.0"
+description = "Game orchestration API for Imposter Image Game"
+requires-python = ">=3.13"
+dependencies = [
+    "fastapi>=0.162.5,<1.0",
+    "pydantic>=2.12,<3.0",
+    "uvicorn[standard]>=0.54.0,<1.0",
+]
