@@ -1,34 +1,39 @@
-import { Lobby } from "~/models";
 import { executeRequest, send } from "./hub";
+import { getServiceUrls } from "./service-urls";
+import { Lobby } from "~/models";
 
 export interface NewLobbyRequestBody {
-	creatorUserId: number;
-	lobbyName: string;
+    creatorUserId: number;
+    lobbyName: string;
 }
 
 export async function getLobbies() {
-	return send<Lobby[]>({
-		endpoint: "/lobbies",
-	});
+    return send<Lobby[]>({
+        baseUrl: getServiceUrls().lobby,
+        endpoint: "/lobbies",
+    });
 }
 
 export async function getLobby(id: string) {
-	return send<Lobby>({
-		endpoint: `/lobbies/${encodeURIComponent(id)}`,
-	});
+    return send<Lobby>({
+        baseUrl: getServiceUrls().lobby,
+        endpoint: `/lobbies/${encodeURIComponent(id)}`,
+    });
 }
 
 export async function createLobby(body: NewLobbyRequestBody) {
-	return send<Lobby>({
-		endpoint: "/lobbies/new",
-		method: "POST",
-		body,
-	});
+    return send<Lobby>({
+        baseUrl: getServiceUrls().lobby,
+        endpoint: "/lobbies/new",
+        method: "POST",
+        body,
+    });
 }
 
 export async function startGame() {
-	await executeRequest({
-		endpoint: "/game/startGame",
-		method: "POST",
-	});
+    await executeRequest({
+        baseUrl: getServiceUrls().lobby,
+        endpoint: "/game/startGame",
+        method: "POST",
+    });
 }

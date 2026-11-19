@@ -1,5 +1,33 @@
 # Mantine Vite template
 
+## Container deployment
+
+Build and run the frontend locally from the repository root:
+
+```sh
+docker build -t frontend:local frontend
+docker run --rm -p 8080:8080 frontend:local
+```
+
+Submit a Cloud Build deployment from the repository root:
+
+```sh
+gcloud builds submit --config=frontend/cloudbuild.yaml .
+```
+
+The Kubernetes Service is internal (`ClusterIP`); expose it through your
+cluster's ingress or gateway to make the frontend available outside the cluster.
+
+## API URLs
+
+The frontend's service URL map is in `src/api/service-urls.ts`. Vite development
+mode uses the local ports from the root Docker Compose setup. Non-development
+builds require `VITE_ACCOUNTS_API_URL`, `VITE_FILES_API_URL`,
+`VITE_LOBBY_API_URL`, `VITE_ORCHESTRATOR_API_URL`, and `VITE_QUESTIONS_API_URL`
+to be set when building the frontend. These values are public URLs embedded in
+the frontend bundle, so do not put secrets in them. Each API must also allow
+the frontend's origin through its `CORS_ORIGINS` setting.
+
 ## Features
 
 This template comes with the following features:

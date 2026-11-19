@@ -1,5 +1,10 @@
-import { Account } from "~/models";
 import { send } from "./hub";
+import { getServiceUrls } from "./service-urls";
+
+interface AccountsTokenResponse {
+    access_token: string;
+    refresh_token: string;
+}
 
 export interface SignUpRequest {
     username: string;
@@ -9,16 +14,21 @@ export interface SignUpRequest {
 export interface SignUpResponse {
     accessToken: string;
     refreshToken: string;
-    account: Account;
 }
 
 export async function signUp(request: SignUpRequest) {
-    return send<SignUpResponse>({
-        endpoint: "/auth/signup",
+    const response = await send<AccountsTokenResponse>({
+        baseUrl: getServiceUrls().accounts,
+        endpoint: "/sign_up",
         method: "POST",
         authorization: "None",
         body: request,
     });
+
+    return {
+        accessToken: response.access_token,
+        refreshToken: response.refresh_token,
+    };
 }
 
 export interface SignInRequest {
@@ -29,16 +39,21 @@ export interface SignInRequest {
 export interface SignInResponse {
     accessToken: string;
     refreshToken: string;
-    account: Account;
 }
 
 export async function signIn(request: SignInRequest) {
-    return send<SignInResponse>({
-        endpoint: "/auth/signin",
+    const response = await send<AccountsTokenResponse>({
+        baseUrl: getServiceUrls().accounts,
+        endpoint: "/sign_in",
         method: "POST",
         authorization: "None",
         body: request,
     });
+
+    return {
+        accessToken: response.access_token,
+        refreshToken: response.refresh_token,
+    };
 }
 
 export interface TokenRequest {
@@ -52,6 +67,7 @@ export interface TokenResponse {
 
 export async function exchangeRefreshToken(request: TokenRequest) {
     return send<TokenResponse>({
+        baseUrl: getServiceUrls().accounts,
         endpoint: "/auth/token",
         method: "POST",
         authorization: "None",

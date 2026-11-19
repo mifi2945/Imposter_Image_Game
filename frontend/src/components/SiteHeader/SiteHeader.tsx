@@ -12,7 +12,8 @@ export function SiteHeader() {
     const hideNavigation = pathname === "/" || pathname === "/credentials";
 
     const links = [
-        ...(account.role === AccountRole.Admin ? [{ to: "/admin", label: "Admin" }] : []),
+        // TODO make this not always true
+        ...(true ? [{ to: "/admin", label: "Admin" }] : []),
         { to: "/game", label: "Game" },
         { to: "/lobbies", label: "Lobbies" },
         { to: "/leaderboard", label: "Leaderboard" },

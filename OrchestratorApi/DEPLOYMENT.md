@@ -22,8 +22,6 @@ gcloud container clusters list --project="$PROJECT_ID"
 gcloud artifacts repositories list --project="$PROJECT_ID" --location="$REGISTRY_REGION"
 ```
 
-Use the project ID, not its display name. An older project called
-`impostor-image-game` has a different ID and is pending deletion.
 
 NEEDED APIs:
 * Cloud Build
@@ -33,6 +31,7 @@ SERVICE ACCOUNT PERMS:
 * push images
 * write Cloud Logging logs
 * deploy into the cluster
+* Kubernetes Engine Developer
 
 
 ## Build and deploy
@@ -57,14 +56,21 @@ kubectl -n orchestrator get pods,services
 kubectl -n files get pods,services
 ```
 
-The Services use ClusterIP. Forward them locally in separate terminals:
+The Services use ClusterIP. From the repository root, run each command in a
+separate terminal and leave both running:
 
 ```bash
 kubectl -n orchestrator port-forward service/orchestrator-api 8002:80
+```
+
+```bash
 kubectl -n files port-forward service/files-api 8003:80
 ```
 
-The same localhost health and Swagger URLs now reach the deployed containers.
+Open the deployed Swagger docs at
+[http://localhost:8002/docs](http://localhost:8002/docs) for Orchestrator and
+[http://localhost:8003/docs](http://localhost:8003/docs) for Files. The forwarded
+ports work only while those terminal commands are running.
 Inside the cluster, their addresses are
 `http://orchestrator-api.orchestrator.svc.cluster.local` and
 `http://files-api.files.svc.cluster.local`. Public ingress is not configured.

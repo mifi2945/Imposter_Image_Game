@@ -1,4 +1,5 @@
 from fastapi import FastAPI, HTTPException, Request, Response, Depends, status
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from google.cloud import firestore
 import os
@@ -9,6 +10,16 @@ from .pw_access import hash_password, verify_password
 from .token_access import Token
 
 app = FastAPI()
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        origin.strip()
+        for origin in os.environ.get("CORS_ORIGINS", "").split(",")
+        if origin.strip()
+    ],
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 bearer_scheme = HTTPBearer()
 db = firestore.AsyncClient(project=os.environ.get("PROJECT", "impostor-image-game-514519"), 
                            database=os.environ.get("ACCOUNTS_DB", "accounts-api-db"))

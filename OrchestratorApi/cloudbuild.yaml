@@ -20,6 +20,7 @@ steps:
       - push
       - ${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_AR_REPOSITORY}/orchestrator-api:${BUILD_ID}
 
+  # Replace local image with real image name in dockerfile
   - name: gcr.io/cloud-builders/gcloud
     entrypoint: bash
     args:
@@ -29,12 +30,14 @@ steps:
         "s|orchestrator-api:local|${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_AR_REPOSITORY}/orchestrator-api:${BUILD_ID}|"
         OrchestratorApi/k8s/orchestrator-api.yaml
 
+  # Upload kuber resources
   - name: gcr.io/cloud-builders/kubectl
     args: [apply, -f, OrchestratorApi/k8s/]
     env:
       - CLOUDSDK_COMPUTE_REGION=${_CLUSTER_LOCATION}
       - CLOUDSDK_CONTAINER_CLUSTER=${_CLUSTER_NAME}
 
+  # Start containers
   - name: gcr.io/cloud-builders/kubectl
     args: [-n, orchestrator, rollout, status, deployment/orchestrator-api, --timeout=180s]
     env:

@@ -13,9 +13,15 @@ spec:
       labels:
         app: files-api
     spec:
+      serviceAccountName: files-api
       containers:
         - name: files-api
           image: files-api:local
+          env:
+            - name: FILES_BUCKET_NAME
+              value: impostor-image-game-514519-images
+            - name: ORCHESTRATOR_API_URL
+              value: "http://orchestrator-api.orchestrator.svc.cluster.local"
           ports:
             - name: http
               containerPort: 8080
