@@ -1,4 +1,5 @@
-from fastapi import APIRouter, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status
+from QuestionsApi.api.util.auth import AuthUser
 from database import create_question as insert_question
 from database import delete_question as remove_question
 from database import get_questions as select_questions
@@ -24,12 +25,18 @@ router = APIRouter(
         400: {"model": ErrorMessage, "description": "Invalid request body or failed validation"},
         401: {"model": ErrorMessage, "description": "Unauthorized"},
         403: {"model": ErrorMessage, "description": "Operation forbidden"}})
-async def create_question(question: QuestionCreate):
+async def create_question(question: QuestionCreate, 
+                          user: AuthUser):
     """
     Create a new question.
     """
+    if user.role != "admin":
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Operation forbidden: Admin role required",
+        )
     return await insert_question(question.category, question.question)
-
+    
 
 @router.get("/",
             response_model=list[Question],
@@ -49,10 +56,15 @@ async def get_questions(category: str | None = None):
                        401: {"model": ErrorMessage, "description": "Unauthorized"},
                        403: {"model": ErrorMessage, "description": "Operation forbidden"},
                        404: {"model": ErrorMessage, "description": "Question not found"}})
-async def delete_question(question_id: int):
+async def delete_question(question_id: int, user: AuthUser):
     """
     Delete a question by ID.
     """
+    if user.role != "admin":
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Operation forbidden: Admin role required",
+        )
     if not await remove_question(question_id):
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
