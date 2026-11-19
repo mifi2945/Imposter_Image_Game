@@ -6,6 +6,14 @@ metadata:
   annotations:
     iam.gke.io/gcp-service-account: accounts-api-runner@impostor-image-game-514519.iam.gserviceaccount.com
 ---
+apiVersion: "v1"
+kind: "ServiceAccount"
+metadata:
+  name: "accounts-api"
+  namespace: "accounts"
+  annotations:
+    iam.gke.io/gcp-service-account: accounts-api-runner@impostor-image-game-514519.iam.gserviceaccount.com
+---
 apiVersion: "apps/v1"
 kind: "Deployment"
 metadata:
@@ -23,6 +31,7 @@ spec:
       labels:
         app: "accounts-api"
     spec:
+      serviceAccountName: "accounts-api"
       containers:
       - name: "accounts-api"
         image: "accounts-api:local"
@@ -30,6 +39,10 @@ spec:
         - name: http
           containerPort: 8000
         env:
+        - name: PROJECT
+          value: impostor-image-game-514519
+        - name: ACCOUNTS_DB
+          value: accounts-api-db
         - name: PRIVATE_KEY_PATH
           value: /var/secrets/accounts/ec_private.pem
         - name: PUBLIC_KEY_PATH
