@@ -16,6 +16,13 @@ spec:
       containers:
         - name: orchestrator-api
           image: orchestrator-api:local
+          env:
+            - name: FILES_API_URL
+              value: "http://files-api.files.svc.cluster.local"
+            - name: LOBBY_API_URL
+              value: "http://lobby-api.lobbies.svc.cluster.local"
+            - name: QUESTIONS_API_URL
+              value: "http://questions-api.questions.svc.cluster.local"
           ports:
             - name: http
               containerPort: 8080

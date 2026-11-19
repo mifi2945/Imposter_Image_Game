@@ -23,4 +23,9 @@ Open [Swagger](http://localhost:8003/docs).
 The service owns its `pyproject.toml` and `uv.lock`. Its Dockerfile uses Python
 3.13 and uv and listens on port 8080.
 
-Submit `cloudbuild.yml` with the repository root as the source context.
+In GKE, the Deployment supplies `ORCHESTRATOR_API_URL` with Orchestrator's
+internal Kubernetes DNS name. The upload-notification handler can read this
+environment variable when it is implemented. Set it to a local URL when
+developing outside the cluster.
+
+Submit `cloudbuild.yaml` with the repository root as the source context.
