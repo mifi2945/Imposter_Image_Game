@@ -95,16 +95,17 @@ export async function executeRequest(request: RequestOptions) {
         accessToken = state.auth.accessToken;
         refreshToken = state.auth.refreshToken;
 
-        if (tokenHelpers.isTokenExpired(accessToken)) {
-            const newTokens = await getRefreshedTokens(refreshToken);
-            accessToken = newTokens.accessToken;
-            refreshToken = newTokens.refreshToken;
+        // TODO un comment me out lol
+        // if (tokenHelpers.isTokenExpired(accessToken)) {
+        //     const newTokens = await getRefreshedTokens(refreshToken);
+        //     accessToken = newTokens.accessToken;
+        //     refreshToken = newTokens.refreshToken;
 
-            getStore().dispatch({
-                type: "auth/setTokens",
-                payload: { accessToken, refreshToken },
-            });
-        }
+        //     getStore().dispatch({
+        //         type: "auth/setTokens",
+        //         payload: { accessToken, refreshToken },
+        //     });
+        // }
     }
 
     const response = await fetch(url, {

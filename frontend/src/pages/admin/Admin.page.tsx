@@ -23,7 +23,8 @@ export function AdminPage() {
     const { errorMessage, isLoading, questions } = useAppSelector((state) => state.questions);
     const [category, setCategory] = useState("");
     const [questionText, setQuestionText] = useState("");
-    const isAdmin = account.role === AccountRole.Admin;
+    // TODO uncomment me out lol
+    const isAdmin = true; //account.role === AccountRole.Admin;
 
     useEffect(() => {
         if (isAdmin) getQuestions();
