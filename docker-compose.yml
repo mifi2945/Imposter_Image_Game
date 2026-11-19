@@ -38,6 +38,7 @@ services:
       PROJECT: local-dev
       ACCOUNTS_DB: "(default)"
       FIRESTORE_EMULATOR_HOST: firestore:8085
+      CORS_ORIGINS: http://localhost:5173,http://127.0.0.1:5173
     depends_on:
       firestore:
         condition: service_started
@@ -47,6 +48,8 @@ services:
       context: ./FilesApi
     ports:
       - "8003:8080"
+    environment:
+      CORS_ORIGINS: http://localhost:5173,http://127.0.0.1:5173
 
   lobby-api:
     build:
@@ -56,6 +59,7 @@ services:
     environment:
       REDIS_HOST: redis
       REDIS_PORT: "6379"
+      CORS_ORIGINS: http://localhost:5173,http://127.0.0.1:5173
     depends_on:
       redis:
         condition: service_healthy
@@ -65,6 +69,8 @@ services:
       context: ./OrchestratorApi
     ports:
       - "8002:8080"
+    environment:
+      CORS_ORIGINS: http://localhost:5173,http://127.0.0.1:5173
 
   questions-api:
     build:
@@ -77,6 +83,7 @@ services:
       PGDATABASE: questions
       PGUSER: questions
       PGPASSWORD: ${POSTGRES_PASSWORD:-local-dev-password}
+      CORS_ORIGINS: http://localhost:5173,http://127.0.0.1:5173
     depends_on:
       postgres:
         condition: service_healthy

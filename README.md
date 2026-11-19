@@ -27,6 +27,8 @@ changes are picked up automatically. The APIs are available locally at:
 Firestore, PostgreSQL, and Redis run locally in Compose; the accounts service
 uses generated development signing keys. Stop the services with
 `docker compose down`. PostgreSQL and Redis data are kept in Docker volumes.
+The APIs allow the local Vite origins for browser requests; deployments should
+set each API's `CORS_ORIGINS` to the frontend's public origin.
 
 Game Flow
 1. Game starts

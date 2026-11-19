@@ -1,8 +1,21 @@
+import os
+
 from fastapi import APIRouter, FastAPI, HTTPException, status
+from fastapi.middleware.cors import CORSMiddleware
 
 from .models import UploadEvent
 
 app = FastAPI(title="Orchestration Service")
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        origin.strip()
+        for origin in os.environ.get("CORS_ORIGINS", "").split(",")
+        if origin.strip()
+    ],
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 home_router = APIRouter(tags=["Orchestration"])
 message_router = APIRouter(prefix="/message", tags=["Messages"])
