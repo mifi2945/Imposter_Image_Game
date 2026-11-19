@@ -48,7 +48,7 @@ workloads to the cluster.
 After creating a regional GKE cluster, configure kubectl to use it:
 
 ```sh
-gcloud container clusters get-credentials questions-cluster \
+gcloud container clusters get-credentials imposter-cluster \
   --region=us-central1
 ```
 
@@ -67,7 +67,7 @@ repository root:
 
 ```sh
 gcloud builds submit --config=QuestionsApi/cloudbuild.yaml \
-  --substitutions=_CLUSTER_NAME=questions-cluster,_CLUSTER_LOCATION=us-central1 .
+  --substitutions=_CLUSTER_NAME=imposter-cluster,_CLUSTER_LOCATION=us-central1 .
 ```
 
 Set `_REGION` and `_AR_REPOSITORY` in `cloudbuild.yaml` to match the Artifact
