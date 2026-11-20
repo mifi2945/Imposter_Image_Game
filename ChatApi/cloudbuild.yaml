@@ -1,0 +1,52 @@
+# Copyright 2020 Google LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+substitutions:
+  _REGION: us-central1
+  _ARTIFACT_REGISTRY_REPO: impostor-repo
+  _SERVICE: chat-api
+  _CLUSTER_NAME: imposter-cluster
+  _WORK_DIR: ChatApi
+
+steps:
+
+# Install dependencies and run unit tests
+- name: 'python:3.13-slim'
+  dir: '${_WORK_DIR}'
+  entrypoint: bash
+  args:
+  - '-c'
+  - |
+    python -m pip install uv
+    uv sync --frozen
+    uv run pytest
+
+# Docker Build
+- name: 'gcr.io/cloud-builders/docker'
+  dir: '${_WORK_DIR}'
+  args: ['build', '-t',
+          '${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_ARTIFACT_REGISTRY_REPO}/${_SERVICE}:${BUILD_ID}', '.']
+
+# Push the image before deploying it
+- name: 'gcr.io/cloud-builders/docker'
+  dir: '${_WORK_DIR}'
+  args:
+  - push
+  - ${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_ARTIFACT_REGISTRY_REPO}/${_SERVICE}:${BUILD_ID}
+
+- name: 'gcr.io/cloud-builders/gke-deploy'
+  dir: '${_WORK_DIR}'
+  args:
+  - 'run'
+  - '--filename=k8s/chat-api.yaml'
+  - '--image=${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_ARTIFACT_REGISTRY_REPO}/${_SERVICE}:${BUILD_ID}'
+  - '--location=${_REGION}'
+  - '--cluster=${_CLUSTER_NAME}'
+
+# Store images in Google Artifact Registry
+images:
+- ${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_ARTIFACT_REGISTRY_REPO}/${_SERVICE}:${BUILD_ID}
+
+# options
+options:
+  logging: CLOUD_LOGGING_ONLY

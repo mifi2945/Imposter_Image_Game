@@ -1,0 +1,21 @@
+[project]
+name = "chatapi"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "fastapi>=0.165.0",
+    "httpx2>=2.16.2",
+    "pyjwt>=2.15.1",
+    "uvicorn[standard]>=0.54.0",
+]
+
+[dependency-groups]
+dev = [
+    "fastapi-cli>=0.0.34",
+    "pytest>=9.2.0",
+]
+
+[tool.pytest.ini_options]
+pythonpath = [".."]
