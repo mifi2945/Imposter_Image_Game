@@ -5,7 +5,7 @@ from google.cloud import firestore
 import os
 import datetime
 
-from .type import Account, AccountStat, AccountDB
+from .type import Account, AccountStat, AccountDB, Role
 from .pw_access import hash_password, verify_password
 from .token_access import Token
 
@@ -39,6 +39,7 @@ async def sign_up(account: Account):
 
     # save to db
     doc = AccountDB(
+        role=Role.USER,
         password=hash_password(pw),
         refresh_token=tokens['hash_refresh_token'],
         expires=(datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(days=7)).isoformat()
@@ -61,7 +62,7 @@ async def sign_in(account: Account):
             detail="Wrong username or password"
         )
 
-    tokens = Token.gen_tokens(user, "user")
+    tokens = Token.gen_tokens(user, doc.get("role"))
     refresh_token_update = {
         "refresh_token": tokens['hash_refresh_token'],
         "expires": (datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(days=7)).isoformat()
