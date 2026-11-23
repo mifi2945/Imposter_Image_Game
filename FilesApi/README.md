@@ -12,7 +12,7 @@ From this directory:
 uv sync --locked
 export FILES_BUCKET_NAME=impostor-image-game-514519-images
 gcloud auth application-default login
-uv run --locked uvicorn api.router:app --reload --port 8003
+uv run --locked uvicorn api.main:create_app --factory --reload --port 8003
 ```
 
 From the repository root:

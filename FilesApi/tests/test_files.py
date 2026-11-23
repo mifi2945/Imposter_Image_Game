@@ -1,10 +1,17 @@
+import asyncio
+import json
 from uuid import UUID
 
+import httpx
 import pytest
+from fastapi import Request
 from fastapi.testclient import TestClient
 from google.api_core.exceptions import NotFound
 
-from api.router import MAX_IMAGE_BYTES, app
+from api.config import Settings
+from api.main import create_app
+from api.proxies.orchestrator import UploadEvent, get_orchestrator_proxy
+from api.routers.file import MAX_IMAGE_BYTES
 from api.storage import ImageStore, get_image_store
 
 
@@ -30,6 +37,7 @@ class FakeStore:
 @pytest.fixture
 def client_and_store():
     store = FakeStore()
+    app = create_app()
     app.dependency_overrides[get_image_store] = lambda: store
     try:
         with TestClient(app) as client:
@@ -106,3 +114,36 @@ def test_gcs_adapter_uses_private_uuid_object_and_upload_metadata():
     assert fake_client.created_bucket.created_blob.upload == (
         b"data", {"content_type": "image/png", "if_generation_match": 0}
     )
+
+
+def test_orchestrator_proxy_uses_shared_client_and_upload_event_contract():
+    requests = []
+
+    def respond(request: httpx.Request) -> httpx.Response:
+        requests.append(request)
+        return httpx.Response(200)
+
+    async def send_event():
+        async with httpx.AsyncClient(transport=httpx.MockTransport(respond)) as client:
+            app = create_app()
+            app.state.settings = Settings(orchestrator_api_url="http://orchestrator.local/")
+            app.state.http = client
+            proxy = get_orchestrator_proxy(Request({"type": "http", "app": app}))
+            assert proxy.client is client
+            await proxy.notify_upload(
+                UploadEvent(
+                    imageKey=UUID("12345678-1234-1234-1234-123456789abc"),
+                    userId=7,
+                    lobbyId=12,
+                )
+            )
+
+    asyncio.run(send_event())
+    assert len(requests) == 1
+    assert requests[0].method == "POST"
+    assert str(requests[0].url) == "http://orchestrator.local/game/upload"
+    assert json.loads(requests[0].content) == {
+        "imageKey": "12345678-1234-1234-1234-123456789abc",
+        "userId": 7,
+        "lobbyId": 12,
+    }

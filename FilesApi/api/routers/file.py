@@ -1,32 +1,18 @@
-import os
-
 import logging
 from uuid import UUID, uuid4
 
-from fastapi import Depends, FastAPI, File, Form, HTTPException, UploadFile, status
+from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile, status
 from fastapi.concurrency import run_in_threadpool
 from fastapi.responses import Response
 from google.api_core.exceptions import GoogleAPICallError, NotFound
 from pydantic import BaseModel, Field
 
-from .storage import ImageStore, get_image_store
-from fastapi.middleware.cors import CORSMiddleware
+from ..storage import ImageStore, get_image_store
 
 
-app = FastAPI(title="Files Service")
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=[
-        origin.strip()
-        for origin in os.environ.get("CORS_ORIGINS", "").split(",")
-        if origin.strip()
-    ],
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
 logger = logging.getLogger(__name__)
 
-MAX_IMAGE_BYTES = 10 * 1024 * 1024 # 10 Mibs
+MAX_IMAGE_BYTES = 10 * 1024 * 1024 # 10 MiB
 IMAGE_TYPES = {"image/jpeg", "image/png", "image/webp"}
 
 
@@ -35,13 +21,11 @@ class UploadedImage(BaseModel):
     image_key: UUID = Field(alias="imageKey")
 
 
-@app.get("/", tags=["Files"])
-async def read_root():
-    """Report that the service is running."""
-    return {"service": "files", "status": "ok"}
+router = APIRouter(prefix="/files", tags=["Files"])
 
 
-@app.post("/files/", response_model=UploadedImage, status_code=status.HTTP_201_CREATED)
+
+@router.post("/", response_model=UploadedImage, status_code=status.HTTP_201_CREATED)
 async def upload_image(
     file: UploadFile = File(),
     user_id: int = Form(alias="userId"),
@@ -69,7 +53,7 @@ async def upload_image(
     return UploadedImage(imageKey=image_key)
 
 
-@app.get("/files/{image_key}")
+@router.get("/{image_key}")
 async def download_image(
     image_key: UUID, store: ImageStore = Depends(get_image_store)
 ):
@@ -88,7 +72,7 @@ async def download_image(
     )
 
 
-@app.delete("/files/{image_key}", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete("/{image_key}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_image(
     image_key: UUID, store: ImageStore = Depends(get_image_store)
 ):
