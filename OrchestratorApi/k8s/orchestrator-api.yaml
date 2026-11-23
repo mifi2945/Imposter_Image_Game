@@ -23,6 +23,8 @@ spec:
               value: "http://lobby-api.lobbies.svc.cluster.local"
             - name: QUESTIONS_API_URL
               value: "http://questions-api.questions.svc.cluster.local"
+            - name: ACCOUNTS_API_URL
+              value: "http://accounts-api-service.accounts.svc.cluster.local:8000"
           ports:
             - name: http
               containerPort: 8080

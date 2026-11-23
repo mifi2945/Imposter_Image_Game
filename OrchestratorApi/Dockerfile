@@ -19,4 +19,4 @@ COPY api ./api
 USER 10001:10001
 EXPOSE 8080
 
-CMD ["uvicorn", "api.router:app", "--host", "0.0.0.0", "--port", "8080"]
+CMD ["uvicorn", "api.main:create_app", "--factory", "--host", "0.0.0.0", "--port", "8080"]

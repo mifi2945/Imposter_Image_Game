@@ -2,8 +2,8 @@
 
 FastAPI service backed by the private Cloud Storage bucket
 `impostor-image-game-514519-images`. `GET /` reports health. `POST /files/`
-uploads a PNG, JPEG, or WebP image as multipart form data (`file`, `userId`,
-`lobbyId`) and returns `{"imageKey": "..."}`. `GET /files/{image_key}` downloads
+uploads a PNG, JPEG, or WebP image as multipart form data (`file`, `user_id`,
+`lobby_id`) and returns `{"image_key": "..."}`. `GET /files/{image_key}` downloads
 it; `DELETE /files/{image_key}` removes it. Images are limited to 10 MiB.
 
 From this directory:
@@ -58,10 +58,12 @@ The service owns its `pyproject.toml` and `uv.lock`. Its Dockerfile uses Python
 3.13 and uv and listens on port 8080.
 
 In GKE, the Deployment supplies `ORCHESTRATOR_API_URL` with Orchestrator's
-internal Kubernetes DNS name. Upload notification is not wired yet because
-Orchestrator's `/game/upload` endpoint still returns 501. The Files API stores
-`userId` and `lobbyId` as object metadata; it does not yet list by lobby or
-validate image contents beyond MIME type and size. Add authentication before
-exposing write or delete endpoints outside the cluster.
+internal Kubernetes DNS name. After storing an image, Files calls Orchestrator's
+`POST /game/upload` with a snake_case `UploadEvent`. That endpoint currently
+returns 501, so uploads will fail at the notification step until it is
+implemented. The Files API stores `user_id` and `lobby_id` as object metadata;
+it does not yet list by lobby or validate image contents beyond MIME type and
+size. Add authentication before exposing write or delete endpoints outside the
+cluster.
 
 Submit `cloudbuild.yaml` with the repository root as the source context.

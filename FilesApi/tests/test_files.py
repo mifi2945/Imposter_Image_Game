@@ -10,7 +10,8 @@ from google.api_core.exceptions import NotFound
 
 from api.config import Settings
 from api.main import create_app
-from api.proxies.orchestrator import UploadEvent, get_orchestrator_proxy
+from api.models import UploadEvent
+from api.proxies.orchestrator import get_orchestrator_proxy
 from api.routers.file import MAX_IMAGE_BYTES
 from api.storage import ImageStore, get_image_store
 
@@ -34,28 +35,39 @@ class FakeStore:
         del self.images[image_key]
 
 
+class FakeOrchestratorProxy:
+    def __init__(self):
+        self.events = []
+
+    async def notify_upload(self, event):
+        self.events.append(event)
+
+
 @pytest.fixture
 def client_and_store():
     store = FakeStore()
+    proxy = FakeOrchestratorProxy()
     app = create_app()
     app.dependency_overrides[get_image_store] = lambda: store
+    app.dependency_overrides[get_orchestrator_proxy] = lambda: proxy
     try:
         with TestClient(app) as client:
-            yield client, store
+            yield client, store, proxy
     finally:
         app.dependency_overrides.clear()
 
 
 def test_upload_download_and_delete(client_and_store):
-    client, store = client_and_store
+    client, store, proxy = client_and_store
     response = client.post(
         "/files/",
-        data={"userId": "7", "lobbyId": "12"},
+        data={"user_id": "7", "lobby_id": "12"},
         files={"file": ("picture.png", b"image bytes", "image/png")},
     )
     assert response.status_code == 201
-    image_key = UUID(response.json()["imageKey"])
+    image_key = UUID(response.json()["image_key"])
     assert store.images[image_key] == (b"image bytes", "image/png", 7, 12)
+    assert proxy.events == [UploadEvent(image_key=image_key, user_id=7, lobby_id=12)]
 
     downloaded = client.get(f"/files/{image_key}")
     assert downloaded.status_code == 200
@@ -68,8 +80,13 @@ def test_upload_download_and_delete(client_and_store):
 
 
 def test_upload_rejects_invalid_type_and_oversize(client_and_store):
-    client, store = client_and_store
-    fields = {"userId": "7", "lobbyId": "12"}
+    client, store, proxy = client_and_store
+    fields = {"user_id": "7", "lobby_id": "12"}
+    assert client.post(
+        "/files/",
+        data={"userId": "7", "lobbyId": "12"},
+        files={"file": ("picture.png", b"image", "image/png")},
+    ).status_code == 422
     assert client.post(
         "/files/", data=fields, files={"file": ("file.txt", b"text", "text/plain")}
     ).status_code == 415
@@ -82,6 +99,7 @@ def test_upload_rejects_invalid_type_and_oversize(client_and_store):
         files={"file": ("huge.png", b"x" * (MAX_IMAGE_BYTES + 1), "image/png")},
     ).status_code == 413
     assert not store.images
+    assert not proxy.events
 
 
 def test_gcs_adapter_uses_private_uuid_object_and_upload_metadata():
@@ -132,9 +150,9 @@ def test_orchestrator_proxy_uses_shared_client_and_upload_event_contract():
             assert proxy.client is client
             await proxy.notify_upload(
                 UploadEvent(
-                    imageKey=UUID("12345678-1234-1234-1234-123456789abc"),
-                    userId=7,
-                    lobbyId=12,
+                    image_key=UUID("12345678-1234-1234-1234-123456789abc"),
+                    user_id=7,
+                    lobby_id=12,
                 )
             )
 
@@ -143,7 +161,7 @@ def test_orchestrator_proxy_uses_shared_client_and_upload_event_contract():
     assert requests[0].method == "POST"
     assert str(requests[0].url) == "http://orchestrator.local/game/upload"
     assert json.loads(requests[0].content) == {
-        "imageKey": "12345678-1234-1234-1234-123456789abc",
-        "userId": 7,
-        "lobbyId": 12,
+        "image_key": "12345678-1234-1234-1234-123456789abc",
+        "user_id": 7,
+        "lobby_id": 12,
     }

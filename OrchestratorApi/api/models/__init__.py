@@ -1,7 +1,9 @@
+"""Models used by the Orchestrator API."""
+
 from enum import Enum
 from uuid import UUID
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
 
 
 class Player(BaseModel):
@@ -21,6 +23,6 @@ class Game(BaseModel):
 
 
 class UploadEvent(BaseModel):
-    image_key: UUID = Field(alias="imageKey")
-    user_id: int = Field(alias="userId")
-    lobby_id: int = Field(alias="lobbyId")
+    image_key: UUID
+    user_id: int
+    lobby_id: int

@@ -5,8 +5,8 @@ from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile, s
 from fastapi.concurrency import run_in_threadpool
 from fastapi.responses import Response
 from google.api_core.exceptions import GoogleAPICallError, NotFound
-from pydantic import BaseModel, Field
-
+from ..models import UploadEvent, UploadedImage
+from ..proxies.orchestrator import OrchestratorProxy, get_orchestrator_proxy
 from ..storage import ImageStore, get_image_store
 
 
@@ -16,11 +16,6 @@ MAX_IMAGE_BYTES = 10 * 1024 * 1024 # 10 MiB
 IMAGE_TYPES = {"image/jpeg", "image/png", "image/webp"}
 
 
-# Random UUIDs for image keys = no concern of random users accessing targeted images
-class UploadedImage(BaseModel):
-    image_key: UUID = Field(alias="imageKey")
-
-
 router = APIRouter(prefix="/files", tags=["Files"])
 
 
@@ -28,9 +23,10 @@ router = APIRouter(prefix="/files", tags=["Files"])
 @router.post("/", response_model=UploadedImage, status_code=status.HTTP_201_CREATED)
 async def upload_image(
     file: UploadFile = File(),
-    user_id: int = Form(alias="userId"),
-    lobby_id: int = Form(alias="lobbyId"),
+    user_id: int = Form(),
+    lobby_id: int = Form(),
     store: ImageStore = Depends(get_image_store),
+    orchestrator_proxy: OrchestratorProxy = Depends(get_orchestrator_proxy),
 ):
     """Store an image and return its key for later retrieval."""
     if file.content_type not in IMAGE_TYPES:
@@ -50,7 +46,15 @@ async def upload_image(
     except GoogleAPICallError:
         logger.exception("Could not upload image %s", image_key)
         raise HTTPException(status.HTTP_503_SERVICE_UNAVAILABLE, "Image storage unavailable") from None
-    return UploadedImage(imageKey=image_key)
+
+    await orchestrator_proxy.notify_upload(
+        UploadEvent(
+            image_key=image_key,
+            user_id=user_id,
+            lobby_id=lobby_id,
+        )
+    )
+    return UploadedImage(image_key=image_key)
 
 
 @router.get("/{image_key}")
@@ -70,6 +74,7 @@ async def download_image(
         media_type=content_type,
         headers={"Cache-Control": "private, no-store"},
     )
+
 
 
 @router.delete("/{image_key}", status_code=status.HTTP_204_NO_CONTENT)
