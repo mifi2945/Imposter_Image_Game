@@ -14,6 +14,8 @@ spec:
         app: files-api
     spec:
       serviceAccountName: files-api
+      nodeSelector:
+        iam.gke.io/gke-metadata-server-enabled: "true"
       containers:
         - name: files-api
           image: files-api:local
