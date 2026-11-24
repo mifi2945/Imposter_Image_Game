@@ -24,6 +24,12 @@ spec:
               value: redis
             - name: REDIS_PORT
               value: "6379"
+            - name: JWT_PUBLIC_KEY_PATH
+              value: /var/run/secrets/accountsapi-es-public/public-key.pem
+          volumeMounts:
+            - name: jwt-public-key
+              mountPath: /var/run/secrets/accountsapi-es-public
+              readOnly: true
           readinessProbe:
             httpGet:
               path: /
@@ -43,6 +49,13 @@ spec:
             limits:
               cpu: 500m
               memory: 512Mi
+      volumes:
+        - name: jwt-public-key
+          secret:
+            secretName: accountsapi-es-public
+            items:
+              - key: public-key.pem
+                path: public-key.pem
 ---
 apiVersion: v1
 kind: Service
